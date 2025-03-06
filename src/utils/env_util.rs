@@ -1,7 +1,7 @@
 use std::env;
 
-pub fn is_prod() -> bool {
-    var_as_str("APP_ENV") == "prod"
+pub fn is_main() -> bool {
+    var_as_str("SOLANA_ENV") == "main"
 }
 
 pub fn remove_whitespace(input: &str) -> String {

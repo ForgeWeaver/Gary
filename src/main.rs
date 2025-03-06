@@ -5,26 +5,36 @@ use clap::Parser;
 use cli::Args;
 use colored::Colorize;
 use dotenv::dotenv;
-use gary::{StdResult, cli, position_manager, utils, wallet};
+use gary::{
+    StdResult, cli, position_manager,
+    utils::{env_util, pool_util},
+    wallet,
+};
 use orca_whirlpools::{WhirlpoolsConfigInput, set_funder, set_whirlpools_config_address};
 use orca_whirlpools_client::get_position_address;
+use pool_util::{
+    display_position_balances, display_wallet_balances, fetch_mint, fetch_position, fetch_whirlpool,
+};
 use position_manager::run_position_manager;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{pubkey::Pubkey, signer::Signer};
-use std::env;
-use std::str::FromStr;
+use std::{env, str::FromStr};
 use tokio::time::{Duration, sleep};
-use utils::pool_util::{
-    display_position_balances, display_wallet_balances, fetch_mint, fetch_position, fetch_whirlpool,
-};
 
 #[tokio::main]
 async fn main() -> StdResult {
     let args = Args::parse();
-    dotenv().ok();
+    let config_addr: WhirlpoolsConfigInput;
+    if env_util::is_main() {
+        dotenv().ok();
+        config_addr = WhirlpoolsConfigInput::SolanaMainnet;
+    } else {
+        dotenv::from_filename(".env.dev").ok();
+        config_addr = WhirlpoolsConfigInput::SolanaDevnet;
+    }
     let rpc_url = env::var("RPC_URL").unwrap();
     let rpc = RpcClient::new(rpc_url.to_string());
-    set_whirlpools_config_address(WhirlpoolsConfigInput::SolanaMainnet)
+    set_whirlpools_config_address(config_addr)
         .expect("Failed to set Whirlpools config address for specified network.");
     let wallet = wallet::load_wallet()?;
     set_funder(wallet.pubkey()).expect("Failed to set funder address.");
