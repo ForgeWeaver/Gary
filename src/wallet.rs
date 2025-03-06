@@ -1,9 +1,10 @@
 // Modified from: https://github.com/orca-so/whirlpools/tree/main/examples/rust-sdk/whirlpool_repositioning_bot
 // Original: https://github.com/orca-so/whirlpools
 
-use gary::BoxedStdError;
 use solana_sdk::{signature::Keypair, signer::Signer};
 use std::{env, fs, path::PathBuf};
+
+use crate::BoxedStdError;
 
 // Loads a Solana keypair from a file, defaulting to ~/.config/solana/id.json or an env var.
 // Returns an impl Signer for use in transactions.
@@ -25,8 +26,8 @@ pub fn load_wallet() -> Result<impl Signer, BoxedStdError> {
     // Convert bytes to Keypair
     let wallet = Keypair::from_bytes(&keypair_bytes)
         .map_err(|e| format!("Failed to create keypair from bytes: {}", e))?;
-
     println!("Valid keypair found. Public key: {}", wallet.pubkey());
+
     Ok(wallet)
 }
 

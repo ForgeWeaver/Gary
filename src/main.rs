@@ -1,16 +1,11 @@
 // Modified from: https://github.com/orca-so/whirlpools/tree/main/examples/rust-sdk/whirlpool_repositioning_bot
 // Original: https://github.com/orca-so/whirlpools
 
-mod cli;
-mod position_manager;
-mod utils;
-mod wallet;
-
 use clap::Parser;
 use cli::Args;
 use colored::Colorize;
 use dotenv::dotenv;
-use gary::StdResult;
+use gary::{StdResult, cli, position_manager, utils, wallet};
 use orca_whirlpools::{WhirlpoolsConfigInput, set_funder, set_whirlpools_config_address};
 use orca_whirlpools_client::get_position_address;
 use position_manager::run_position_manager;
