@@ -3,7 +3,7 @@
 
 use crate::{
     cli::Args,
-    utils::{
+    utils::pool_utils::{
         display_position_balances, display_wallet_balances, fetch_position, fetch_whirlpool,
         send_transaction,
     },
