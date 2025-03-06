@@ -21,7 +21,7 @@ use spl_token_2022::state::Mint;
 pub async fn run_position_manager(
     rpc: &RpcClient,
     args: &Args,
-    wallet: &Box<dyn Signer>,
+    wallet: &impl Signer,
     position: &mut Position,
     token_mint_a: &Mint,
     token_mint_b: &Mint,
@@ -107,7 +107,7 @@ pub async fn run_position_manager(
         all_instructions.extend(close_position_instructions.instructions);
         all_instructions.extend(open_position_instructions.instructions);
 
-        let mut signers: Vec<&dyn Signer> = vec![wallet.as_ref()];
+        let mut signers: Vec<&dyn Signer> = vec![wallet];
         signers.extend(
             open_position_instructions
                 .additional_signers
@@ -123,7 +123,7 @@ pub async fn run_position_manager(
 
         let signature = send_transaction(
             rpc,
-            wallet.as_ref(),
+            wallet,
             &whirlpool_address,
             all_instructions,
             signers,

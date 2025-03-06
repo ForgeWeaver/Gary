@@ -10,27 +10,28 @@ use clap::Parser;
 use cli::Args;
 use colored::Colorize;
 use dotenv::dotenv;
-use orca_whirlpools::{set_funder, set_whirlpools_config_address, WhirlpoolsConfigInput};
+use gary::StdResult;
+use orca_whirlpools::{WhirlpoolsConfigInput, set_funder, set_whirlpools_config_address};
 use orca_whirlpools_client::get_position_address;
 use position_manager::run_position_manager;
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::pubkey::Pubkey;
+use solana_sdk::{pubkey::Pubkey, signer::Signer};
 use std::env;
 use std::str::FromStr;
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration, sleep};
 use utils::{
     display_position_balances, display_wallet_balances, fetch_mint, fetch_position, fetch_whirlpool,
 };
 
 #[tokio::main]
-async fn main() {
+async fn main() -> StdResult {
     let args = Args::parse();
     dotenv().ok();
     let rpc_url = env::var("RPC_URL").unwrap();
     let rpc = RpcClient::new(rpc_url.to_string());
     set_whirlpools_config_address(WhirlpoolsConfigInput::SolanaMainnet)
         .expect("Failed to set Whirlpools config address for specified network.");
-    let wallet = wallet::load_wallet();
+    let wallet = wallet::load_wallet()?;
     set_funder(wallet.pubkey()).expect("Failed to set funder address.");
 
     let position_mint_address = Pubkey::from_str(&args.position_mint_address)
@@ -45,7 +46,11 @@ async fn main() {
     println!("Configuration:");
     println!(
         "  Position Mint Address: {}\n  Threshold: {:.2}bps\n  Interval: {} seconds\n  Priority Fee Tier: {:?}\n  Slippage tolerance bps: {:?}\n",
-        args.position_mint_address, args.threshold, args.interval, args.priority_fee_tier, args.slippage_tolerance_bps
+        args.position_mint_address,
+        args.threshold,
+        args.interval,
+        args.priority_fee_tier,
+        args.slippage_tolerance_bps
     );
 
     println!("-------------------------------------\n");
