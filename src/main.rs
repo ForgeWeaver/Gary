@@ -32,7 +32,7 @@ async fn main() -> StdResult {
         dotenv::from_filename(".env.dev").ok();
         config_addr = WhirlpoolsConfigInput::SolanaDevnet;
     }
-    let rpc_url = env::var("RPC_URL").unwrap();
+    let rpc_url = env::var("RPC_URL").expect("RPC_URL must be set in .env.dev");
     let rpc = RpcClient::new(rpc_url.to_string());
     set_whirlpools_config_address(config_addr)
         .expect("Failed to set Whirlpools config address for specified network.");
@@ -45,7 +45,7 @@ async fn main() -> StdResult {
     println!(
         "\n\
         ====================\n\
-        🌀 Whirlpool LP BOT \n\
+        @ Whirlpool LP BOT \n\
         ====================\n"
     );
     println!("Configuration:");
@@ -57,14 +57,18 @@ async fn main() -> StdResult {
         args.priority_fee_tier,
         args.slippage_tolerance_bps
     );
-
     println!("-------------------------------------\n");
 
     let (position_address, _) =
         get_position_address(&position_mint_address).expect("Failed to derive position address.");
-    let mut position = fetch_position(&rpc, &position_address)
-        .await
-        .expect("Failed to fetch position data.");
+    let position_result = fetch_position(&rpc, &position_address).await;
+    let mut position = match position_result {
+        Ok(pos) => pos,
+        Err(e) => {
+            eprintln!("{}", format!("Error fetching position: {}. Ensure the position mint address is correct and exists.", e).red());
+            return Err(e);
+        }
+    };
     let whirlpool = fetch_whirlpool(&rpc, &position.whirlpool)
         .await
         .expect("Failed to fetch Whirlpool data.");
