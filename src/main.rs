@@ -14,7 +14,7 @@ use solana_sdk::{pubkey::Pubkey, signer::Signer};
 use std::env;
 use std::str::FromStr;
 use tokio::time::{Duration, sleep};
-use utils::{
+use utils::pool_util::{
     display_position_balances, display_wallet_balances, fetch_mint, fetch_position, fetch_whirlpool,
 };
 

@@ -3,7 +3,7 @@
 
 use clap::Parser;
 
-use crate::utils::pool_utils::PriorityFeeTier;
+use crate::utils::pool_util::PriorityFeeTier;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
