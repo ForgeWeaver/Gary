@@ -15,13 +15,13 @@ use orca_whirlpools::{
 use orca_whirlpools_client::{Position, get_position_address};
 use orca_whirlpools_core::{sqrt_price_to_price, tick_index_to_price, tick_index_to_sqrt_price};
 use solana_client::nonblocking::rpc_client::RpcClient;
-use solana_sdk::signer::Signer;
+use solana_sdk::{signature::Keypair, signer::Signer};
 use spl_token_2022::state::Mint;
 
 pub async fn run_position_manager(
     rpc: &RpcClient,
     args: &Args,
-    wallet: &impl Signer,
+    wallet: &Keypair,
     position: &mut Position,
     token_mint_a: &Mint,
     token_mint_b: &Mint,

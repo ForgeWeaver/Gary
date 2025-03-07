@@ -13,7 +13,7 @@ mod tests {
 
     use gary::{utils::addr_util::create_associated_token_address, wallet};
     use solana_client::nonblocking::rpc_client::RpcClient;
-    use solana_sdk::{pubkey::Pubkey, signer::Signer};
+    use solana_sdk::{pubkey::Pubkey, signature::Keypair, signer::Signer};
     use spl_associated_token_account::get_associated_token_address;
 
     const DEVNET_RPC: &str = "https://api.devnet.solana.com";
@@ -21,7 +21,7 @@ mod tests {
     const TOKEN_PROGRAM_ID: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 
     // Helper to load wallet and ensure it has SOL
-    async fn setup_wallet(rpc: &RpcClient) -> impl Signer {
+    async fn setup_wallet(rpc: &RpcClient) -> Keypair {
         let wallet = wallet::load_wallet().expect("Failed to load wallet");
         // Ensure wallet has some SOL for transaction fees
         let balance = rpc.get_balance(&wallet.pubkey()).await.unwrap_or(0);

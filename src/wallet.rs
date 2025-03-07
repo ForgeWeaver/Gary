@@ -7,8 +7,8 @@ use std::{env, fs, path::PathBuf};
 use crate::BoxedStdError;
 
 // Loads a Solana keypair from a file, defaulting to ~/.config/solana/id.json or an env var.
-// Returns an impl Signer for use in transactions.
-pub fn load_wallet() -> Result<impl Signer, BoxedStdError> {
+// Returns a Keypair/Signer for use in transactions.
+pub fn load_wallet() -> Result<Keypair, BoxedStdError> {
     // Get keypair path from env var GARY_WALLET_PATH, fallback to default
     let keypair_path = get_solana_keypair_path();
     println!("Solana keypair path: {:?}", keypair_path);

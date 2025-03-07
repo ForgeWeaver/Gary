@@ -1,7 +1,9 @@
 use crate::BoxedStdError;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{
-    commitment_config::CommitmentConfig, pubkey::Pubkey, signature::Signer,
+    commitment_config::CommitmentConfig,
+    pubkey::Pubkey,
+    signature::{Keypair, Signer},
     transaction::Transaction,
 };
 use spl_associated_token_account::{
@@ -10,7 +12,7 @@ use spl_associated_token_account::{
 
 pub async fn create_associated_token_address(
     rpc_client: &RpcClient,
-    payer: &impl Signer,
+    payer: &Keypair,
     owner: &Pubkey,
     token_mint_address: &Pubkey,
     token_program_id: &Pubkey,
