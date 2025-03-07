@@ -24,14 +24,13 @@ use tokio::time::{Duration, sleep};
 #[tokio::main]
 async fn main() -> StdResult {
     let args = Args::parse();
-    let config_addr: WhirlpoolsConfigInput;
-    if env_util::is_main() {
+    let config_addr: WhirlpoolsConfigInput = if env_util::is_main() {
         dotenv().ok();
-        config_addr = WhirlpoolsConfigInput::SolanaMainnet;
+        WhirlpoolsConfigInput::SolanaMainnet
     } else {
         dotenv::from_filename(".env.dev").ok();
-        config_addr = WhirlpoolsConfigInput::SolanaDevnet;
-    }
+        WhirlpoolsConfigInput::SolanaDevnet
+    };
     let rpc_url = env::var("RPC_URL").expect("RPC_URL must be set in .env.dev");
     let rpc = RpcClient::new(rpc_url.to_string());
     set_whirlpools_config_address(config_addr)

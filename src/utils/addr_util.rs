@@ -1,3 +1,4 @@
+use crate::BoxedStdError;
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{
     commitment_config::CommitmentConfig, pubkey::Pubkey, signature::Signer,
@@ -6,8 +7,6 @@ use solana_sdk::{
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
 };
-
-use crate::BoxedStdError;
 
 pub async fn create_associated_token_address(
     rpc_client: &RpcClient,
@@ -58,7 +57,7 @@ pub async fn create_associated_token_address(
             CommitmentConfig::confirmed(),
         )
         .await
-        .map_err(|e| format!("Failed to send and confirm transaction: {}", e))?;
+        .map_err(|e| format!("Failed to send and confirm transaction: {e}"))?;
 
     println!(
         "Associated Token Address created: {associated_token_address} (Transaction: {signature})"
