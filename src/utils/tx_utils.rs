@@ -12,7 +12,7 @@ use crate::{BoxedStdError, utils::env_util::is_main};
 /// # Arguments
 /// * `rpc_client` - The RPC client for Solana Devnet/Mainnet.
 /// * `instructions` - List of instructions to include in the transaction.
-/// * `payer` - Optional payer pubkey; defaults to the first signer's pubkey if None.
+/// * `payer` - The payer pubkey.
 /// * `signing_keypairs` - The keypairs signing the transaction.
 /// * `commitment` - Commitment level for confirmation (default: confirmed).
 /// * `max_retries` - Maximum number of retries on failure (default: 3).
