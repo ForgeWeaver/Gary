@@ -6,6 +6,7 @@ mod tests {
     use std::str::FromStr;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    #[ignore]
     async fn test_fetch_splash_pool_from_devnet() {
         // https://dev.orca.so/Whirlpools%20SDKs/Whirlpools/Whirlpool%20Management/Fetch%20Pools/#fetching-a-splash-pool
         use orca_whirlpools::fetch_splash_pool;

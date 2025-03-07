@@ -12,8 +12,7 @@ use std::str::FromStr;
 
 use crate::{BoxedStdError, utils::addr_util::create_associated_token_address};
 
-// Existing fetch_* functions assumed to be here...
-
+// https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
 pub async fn swap_sol_to_devusdc(
     rpc_client: &RpcClient,
     wallet: &Keypair,
@@ -82,6 +81,10 @@ pub async fn swap_sol_to_devusdc(
         .map_err(|e| format!("Failed to send and confirm transaction: {}", e))?;
 
     println!("Swapped SOL to devUSDC, signature: {}", signature);
+    println!(
+        "Scan: https://explorer.solana.com/tx/{}?cluster=devnet",
+        signature
+    );
 
     // Check balance (optional for logging)
     let balance = rpc_client
