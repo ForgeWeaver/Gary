@@ -2,14 +2,10 @@ use std::{collections::HashMap, fs::read_to_string};
 
 use serde::Deserialize;
 
+use super::networks::Network;
+
 const MAINNET_TOKENS_JSON: &str = "mainnet_tokens.json";
 const DEVNET_TOKENS_JSON: &str = "devnet_tokens.json";
-
-#[derive(Debug, Eq, Hash, PartialEq)]
-pub enum Network {
-    Mainnet,
-    Devnet,
-}
 
 #[derive(Debug, Deserialize)]
 pub struct Token {

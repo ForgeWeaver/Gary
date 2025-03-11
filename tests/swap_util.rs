@@ -2,14 +2,11 @@
 mod tests {
     use std::{str::FromStr, time::Duration};
 
-    use gary::utils::swap_util::swap_sol_to_devusdc;
-    use gary::wallet;
+    use gary::{config::networks::Network::Devnet, utils::swap_util::swap_sol_to_devusdc, wallet};
     use solana_client::nonblocking::rpc_client::RpcClient;
     use solana_sdk::{pubkey::Pubkey, signature::Keypair, signer::Signer};
     use spl_associated_token_account::get_associated_token_address;
     use tokio::time::sleep;
-
-    const DEVNET_RPC: &str = "https://api.devnet.solana.com";
 
     // Helper to ensure wallet has SOL
     async fn setup_wallet(rpc: &RpcClient) -> Keypair {
@@ -28,7 +25,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_swap_sol_to_devusdc() {
-        let rpc = RpcClient::new(DEVNET_RPC.to_string());
+        let rpc = Devnet.rpc_client();
         let wallet = setup_wallet(&rpc).await;
 
         let user_vault = get_associated_token_address(
