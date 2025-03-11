@@ -1,16 +1,17 @@
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{
-    commitment_config::CommitmentConfig,
     instruction::Instruction,
     pubkey::Pubkey,
     signature::{Keypair, Signer},
     system_program,
-    transaction::Transaction,
 };
 use spl_associated_token_account::get_associated_token_address;
 use std::str::FromStr;
 
-use crate::{BoxedStdError, utils::addr_util::create_associated_token_address};
+use crate::{
+    BoxedStdError,
+    utils::{addr_util::create_associated_token_address, tx_utils::send_and_confirm_transaction},
+};
 
 // https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
 pub async fn swap_sol_to_devusdc(
@@ -60,31 +61,18 @@ pub async fn swap_sol_to_devusdc(
         data: vec![0xBF, 0x2C, 0xDF, 0xCF, 0xA4, 0xEC, 0x7E, 0x3D], // Distribute instruction
     };
 
-    // Build and send transaction
-    let recent_blockhash = rpc_client
-        .get_latest_blockhash()
-        .await
-        .map_err(|e| format!("Failed to get latest blockhash: {}", e))?;
-    let transaction = Transaction::new_signed_with_payer(
+    // Send and confirm the transaction
+    let signature = send_and_confirm_transaction(
+        rpc_client,
         &[instruction],
-        Some(&user),
+        &user,
         &[wallet],
-        recent_blockhash,
-    );
-
-    let signature = rpc_client
-        .send_and_confirm_transaction_with_spinner_and_commitment(
-            &transaction,
-            CommitmentConfig::confirmed(),
-        )
-        .await
-        .map_err(|e| format!("Failed to send and confirm transaction: {}", e))?;
-
+        None,
+        None,
+        None,
+    )
+    .await?;
     println!("Swapped SOL to devUSDC, signature: {}", signature);
-    println!(
-        "Scan: https://explorer.solana.com/tx/{}?cluster=devnet",
-        signature
-    );
 
     // Check balance (optional for logging)
     let balance = rpc_client

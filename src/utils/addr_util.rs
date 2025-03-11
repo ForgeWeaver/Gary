@@ -1,10 +1,8 @@
-use crate::BoxedStdError;
+use crate::{BoxedStdError, utils::tx_utils::send_and_confirm_transaction};
 use solana_client::nonblocking::rpc_client::RpcClient;
 use solana_sdk::{
-    commitment_config::CommitmentConfig,
     pubkey::Pubkey,
     signature::{Keypair, Signer},
-    transaction::Transaction,
 };
 use spl_associated_token_account::{
     get_associated_token_address, instruction::create_associated_token_account,
@@ -38,28 +36,17 @@ pub async fn create_associated_token_address(
         token_program_id,
     );
 
-    // Get the latest blockhash
-    let recent_blockhash = rpc_client
-        .get_latest_blockhash()
-        .await
-        .map_err(|e| format!("Failed to get latest blockhash: {e}"))?;
-
-    // Build and sign the transaction
-    let transaction = Transaction::new_signed_with_payer(
-        &[create_ata_ix],
-        Some(&payer.pubkey()),
-        &[payer],
-        recent_blockhash,
-    );
-
     // Send and confirm the transaction
-    let signature = rpc_client
-        .send_and_confirm_transaction_with_spinner_and_commitment(
-            &transaction,
-            CommitmentConfig::confirmed(),
-        )
-        .await
-        .map_err(|e| format!("Failed to send and confirm transaction: {e}"))?;
+    let signature = send_and_confirm_transaction(
+        rpc_client,
+        &[create_ata_ix],
+        &payer.pubkey(),
+        &[payer],
+        None,
+        None,
+        None,
+    )
+    .await?;
 
     println!(
         "Associated Token Address created: {associated_token_address} (Transaction: {signature})"

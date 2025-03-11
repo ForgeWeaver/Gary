@@ -20,7 +20,7 @@ use crate::{BoxedStdError, utils::env_util::is_main};
 ///
 /// # Returns
 /// * `Result<Signature, BoxedStdError>` - The transaction signature on success.
-pub async fn send_and_confirm_transaction<T: Signers>(
+pub async fn send_and_confirm_transaction<T: Signers + ?Sized>(
     rpc_client: &RpcClient,
     instructions: &[Instruction],
     payer: &Pubkey,
