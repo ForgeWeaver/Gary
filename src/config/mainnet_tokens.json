@@ -1,0 +1,22 @@
+[
+  {
+    "symbol": "ORCA",
+    "mint_address": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+    "decimals": 6
+  },
+  {
+    "symbol": "RAY",
+    "mint_address": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "decimals": 6
+  },
+  {
+    "symbol": "SOL",
+    "mint_address": "So11111111111111111111111111111111111111112",
+    "decimals": 9
+  },
+  {
+    "symbol": "USDC",
+    "mint_address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "decimals": 6
+  }
+]

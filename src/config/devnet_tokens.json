@@ -1,0 +1,27 @@
+[
+  {
+    "symbol": "devSAMO",
+    "mint_address": "Jd4M8bfJG3sAkd82RsGWyEXoaBXQP7njFzBwEaCTuDa",
+    "decimals": 9
+  },
+  {
+    "symbol": "devTMAC",
+    "mint_address": "Afn8YB1p4NsoZeS5XJBZ18LTfEy5NFPwN46wapZcBQr6",
+    "decimals": 6
+  },
+  {
+    "symbol": "devUSDC",
+    "mint_address": "BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k",
+    "decimals": 6
+  },
+  {
+    "symbol": "devUSDT",
+    "mint_address": "H8UekPGwePSmQ3ttuYGPU1szyFfjZR4N53rymSFwpLPm",
+    "decimals": 6
+  },
+  {
+    "symbol": "SOL",
+    "mint_address": "So11111111111111111111111111111111111111112",
+    "decimals": 9
+  }
+]
