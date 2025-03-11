@@ -10,26 +10,34 @@ use std::str::FromStr;
 
 use crate::{
     BoxedStdError,
+    config::tokens::Token,
+    constants::addresses::{
+        ASSOCIATED_TOKEN_PROGRAM_ID, ORCA_DEVTOKEN_ADMIN, ORCA_DEVTOKEN_DISTRIBUTOR_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+    },
     utils::{addr_util::create_associated_token_address, tx_utils::send_and_confirm_transaction},
 };
 
 // https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
-pub async fn swap_sol_to_devusdc(
+pub async fn swap_sol_to_dev_token(
     rpc_client: &RpcClient,
     wallet: &Keypair,
+    token: &Token,
 ) -> Result<(), BoxedStdError> {
-    let dev_usdc_mint = Pubkey::from_str("BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k")?;
-    let token_program_id = Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")?;
-    let associated_token_program_id =
-        Pubkey::from_str("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")?;
-    let devtoken_distributor_program_id =
-        Pubkey::from_str("Bu2AaWnVoveQT47wP4obpmmZUwK9bN9ah4w6Vaoa93Y9")?;
-    let devtoken_admin = Pubkey::from_str("3otH3AHWqkqgSVfKFkrxyDqd2vK6LcaqigHrFEmWcGuo")?;
-    let pda = Pubkey::from_str("3pgfe1L6jcq59uy3LZmmeSCk9mwVvHXjn21nSvNr8D6x")?;
+    let token_symbol = &token.symbol;
+    let token_mint_address = token.as_pubkey()?;
+    let token_program_id = Pubkey::from_str(TOKEN_PROGRAM_ID)?;
+    let associated_token_program_id = Pubkey::from_str(ASSOCIATED_TOKEN_PROGRAM_ID)?;
+    let devtoken_distributor_program_id = Pubkey::from_str(ORCA_DEVTOKEN_DISTRIBUTOR_PROGRAM_ID)?;
+    let devtoken_admin = Pubkey::from_str(ORCA_DEVTOKEN_ADMIN)?;
+    let (pda, _) = Pubkey::find_program_address(
+        &[token_mint_address.as_ref()],
+        &devtoken_distributor_program_id,
+    );
 
     let user = wallet.pubkey();
-    let vault = get_associated_token_address(&pda, &dev_usdc_mint);
-    let user_vault = get_associated_token_address(&user, &dev_usdc_mint);
+    let vault = get_associated_token_address(&pda, &token_mint_address);
+    let user_vault = get_associated_token_address(&user, &token_mint_address);
 
     // Ensure user_vault (ATA) exists
     if rpc_client.get_account(&user_vault).await.is_err() {
@@ -37,18 +45,18 @@ pub async fn swap_sol_to_devusdc(
             rpc_client,
             wallet,
             &user,
-            &dev_usdc_mint,
+            &token_mint_address,
             &token_program_id,
         )
         .await?;
-        println!("Created devUSDC ATA: {}", user_vault);
+        println!("Created {token_symbol} ATA: {user_vault}");
     }
 
     // Build the swap instruction
     let instruction = Instruction {
         program_id: devtoken_distributor_program_id,
         accounts: vec![
-            solana_sdk::instruction::AccountMeta::new_readonly(dev_usdc_mint, false),
+            solana_sdk::instruction::AccountMeta::new_readonly(token_mint_address, false),
             solana_sdk::instruction::AccountMeta::new(vault, false),
             solana_sdk::instruction::AccountMeta::new_readonly(pda, false),
             solana_sdk::instruction::AccountMeta::new(user, true),
@@ -72,14 +80,17 @@ pub async fn swap_sol_to_devusdc(
         None,
     )
     .await?;
-    println!("Swapped SOL to devUSDC, signature: {}", signature);
+    println!("Swapped SOL to {token_symbol}, signature: {}", signature);
 
     // Check balance (optional for logging)
     let balance = rpc_client
         .get_token_account_balance(&user_vault)
         .await
         .map_err(|e| format!("Failed to get token balance: {}", e))?;
-    println!("devUSDC balance: {}", balance.ui_amount.unwrap_or(0.0));
+    println!(
+        "{token_symbol} balance: {}",
+        balance.ui_amount.unwrap_or(0.0)
+    );
 
     Ok(())
 }

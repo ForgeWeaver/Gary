@@ -1,0 +1,7 @@
+pub const SYSTEM_PROGRAM_ID: &str = "11111111111111111111111111111111";
+pub const TOKEN_PROGRAM_ID: &str = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+pub const ASSOCIATED_TOKEN_PROGRAM_ID: &str = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+
+pub const ORCA_DEVTOKEN_ADMIN: &str = "3otH3AHWqkqgSVfKFkrxyDqd2vK6LcaqigHrFEmWcGuo";
+pub const ORCA_DEVTOKEN_DISTRIBUTOR_PROGRAM_ID: &str =
+    "Bu2AaWnVoveQT47wP4obpmmZUwK9bN9ah4w6Vaoa93Y9";

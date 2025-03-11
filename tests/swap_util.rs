@@ -1,10 +1,17 @@
 #[cfg(test)]
 mod tests {
-    use std::{str::FromStr, time::Duration};
+    use std::time::Duration;
 
-    use gary::{config::networks::Network::Devnet, utils::swap_util::swap_sol_to_devusdc, wallet};
+    use gary::{
+        config::{
+            networks::Network::{self, Devnet},
+            tokens::Tokens,
+        },
+        utils::swap_util::swap_sol_to_dev_token,
+        wallet,
+    };
     use solana_client::nonblocking::rpc_client::RpcClient;
-    use solana_sdk::{pubkey::Pubkey, signature::Keypair, signer::Signer};
+    use solana_sdk::{signature::Keypair, signer::Signer};
     use spl_associated_token_account::get_associated_token_address;
     use tokio::time::sleep;
 
@@ -27,11 +34,12 @@ mod tests {
     async fn test_swap_sol_to_devusdc() {
         let rpc = Devnet.rpc_client();
         let wallet = setup_wallet(&rpc).await;
+        let tokens = Tokens::load();
 
-        let user_vault = get_associated_token_address(
-            &wallet.pubkey(),
-            &Pubkey::from_str("BRjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k").unwrap(),
-        );
+        let dev_usdc: gary::config::tokens::Token =
+            tokens.get(&Network::Devnet, "devUSDC").unwrap().clone();
+        let dev_usdc_mint = dev_usdc.clone().as_pubkey().unwrap();
+        let user_vault = get_associated_token_address(&wallet.pubkey(), &dev_usdc_mint);
         let initial_balance = rpc
             .get_token_account_balance(&user_vault)
             .await
@@ -43,7 +51,7 @@ mod tests {
             return;
         }
 
-        let result = swap_sol_to_devusdc(&rpc, &wallet).await;
+        let result = swap_sol_to_dev_token(&rpc, &wallet, &dev_usdc).await;
         assert!(result.is_ok(), "Swap failed: {:?}", result.err());
 
         // Wait for RPC to catch up (Devnet can be slow)

@@ -1,13 +1,6 @@
 #[cfg(test)]
 mod tests {
     // https://everlastingsong.github.io/nebula/
-    // devToken specification
-    // | Token Mint Address                            | Decimals | Dev Token |
-    // |-----------------------------------------------|---------:|-----------|
-    // | brjpCHtyQLNCo8gqRUr8jtdAj5AjPYQaoqbvcZiHok1k6 |        6 | devUSDC   |
-    // | 8UekPGwePSmQ3ttuYGPU1szyFfjZR4N53rymSFwpLPm6  |        6 | devUSDTH  |
-    // | Jd4M8bfJG3sAkd82RsGWyEXoaBXQP7njFzBwEaCTuDa9  |        9 | devSAMO   |
-    // | fn8YB1p4NsoZeS5XJBZ18LTfEy5NFPwN46wapZcBQr66  |        9 | devTMACA  |
 
     use std::str::FromStr;
 
