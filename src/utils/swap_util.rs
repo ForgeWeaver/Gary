@@ -18,22 +18,21 @@ use crate::{
     utils::{addr_util::create_associated_token_address, tx_utils::send_and_confirm_transaction},
 };
 
-// https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
-pub async fn swap_sol_to_orca_dev_token(
+// Generic function for swapping SOL to any token
+pub async fn swap_sol_to_token(
     rpc_client: &RpcClient,
     wallet: &Keypair,
     token: &Token,
+    token_program_id: &Pubkey,
+    token_distributor_program_id: &Pubkey,
+    distributor_admin: &Pubkey,
+    instruction_data: Vec<u8>,
 ) -> Result<(), BoxedStdError> {
     let token_symbol = &token.symbol;
     let token_mint_address = token.as_pubkey()?;
-    let token_program_id = Pubkey::from_str(TOKEN_PROGRAM_ID)?;
     let associated_token_program_id = Pubkey::from_str(ASSOCIATED_TOKEN_PROGRAM_ID)?;
-    let devtoken_distributor_program_id = Pubkey::from_str(ORCA_DEVTOKEN_DISTRIBUTOR_PROGRAM_ID)?;
-    let devtoken_admin = Pubkey::from_str(ORCA_DEVTOKEN_ADMIN)?;
-    let (pda, _) = Pubkey::find_program_address(
-        &[token_mint_address.as_ref()],
-        &devtoken_distributor_program_id,
-    );
+    let (pda, _) =
+        Pubkey::find_program_address(&[token_mint_address.as_ref()], token_distributor_program_id);
 
     let user = wallet.pubkey();
     let vault = get_associated_token_address(&pda, &token_mint_address);
@@ -46,7 +45,7 @@ pub async fn swap_sol_to_orca_dev_token(
             wallet,
             &user,
             &token_mint_address,
-            &token_program_id,
+            token_program_id,
         )
         .await?;
         println!("Created {token_symbol} ATA: {user_vault}");
@@ -54,19 +53,19 @@ pub async fn swap_sol_to_orca_dev_token(
 
     // Build the swap instruction
     let instruction = Instruction {
-        program_id: devtoken_distributor_program_id,
+        program_id: *token_distributor_program_id,
         accounts: vec![
             solana_sdk::instruction::AccountMeta::new_readonly(token_mint_address, false),
             solana_sdk::instruction::AccountMeta::new(vault, false),
             solana_sdk::instruction::AccountMeta::new_readonly(pda, false),
             solana_sdk::instruction::AccountMeta::new(user, true),
             solana_sdk::instruction::AccountMeta::new(user_vault, false),
-            solana_sdk::instruction::AccountMeta::new(devtoken_admin, false),
-            solana_sdk::instruction::AccountMeta::new_readonly(token_program_id, false),
+            solana_sdk::instruction::AccountMeta::new(*distributor_admin, false),
+            solana_sdk::instruction::AccountMeta::new_readonly(*token_program_id, false),
             solana_sdk::instruction::AccountMeta::new_readonly(system_program::id(), false),
             solana_sdk::instruction::AccountMeta::new_readonly(associated_token_program_id, false),
         ],
-        data: vec![0xBF, 0x2C, 0xDF, 0xCF, 0xA4, 0xEC, 0x7E, 0x3D], // Distribute instruction
+        data: instruction_data, // Pass the specific instruction data for the token
     };
 
     // Send and confirm the transaction
@@ -93,4 +92,29 @@ pub async fn swap_sol_to_orca_dev_token(
     );
 
     Ok(())
+}
+
+// Specific function for swapping SOL to Orca dev token
+// https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
+pub async fn swap_sol_to_orca_dev_token(
+    rpc_client: &RpcClient,
+    wallet: &Keypair,
+    token: &Token,
+) -> Result<(), BoxedStdError> {
+    // Orca dev token specific details
+    let orca_dev_token_program_id = Pubkey::from_str(ORCA_DEVTOKEN_DISTRIBUTOR_PROGRAM_ID)?;
+    let orca_dev_token_admin = Pubkey::from_str(ORCA_DEVTOKEN_ADMIN)?;
+    let instruction_data = vec![0xBF, 0x2C, 0xDF, 0xCF, 0xA4, 0xEC, 0x7E, 0x3D]; // Distribute instruction
+
+    // Call the generic function
+    swap_sol_to_token(
+        rpc_client,
+        wallet,
+        token,
+        &Pubkey::from_str(TOKEN_PROGRAM_ID)?,
+        &orca_dev_token_program_id,
+        &orca_dev_token_admin,
+        instruction_data,
+    )
+    .await
 }
