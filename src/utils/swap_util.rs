@@ -19,7 +19,7 @@ use crate::{
 };
 
 // https://github.com/everlastingsong/tour-de-whirlpool/blob/main/src/EN/convert_sol_to_dev_token.ts
-pub async fn swap_sol_to_dev_token(
+pub async fn swap_sol_to_orca_dev_token(
     rpc_client: &RpcClient,
     wallet: &Keypair,
     token: &Token,

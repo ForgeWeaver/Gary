@@ -7,7 +7,7 @@ mod tests {
             networks::Network::{self, Devnet},
             tokens::Tokens,
         },
-        utils::swap_util::swap_sol_to_dev_token,
+        utils::swap_util::swap_sol_to_orca_dev_token,
         wallet,
     };
     use solana_client::nonblocking::rpc_client::RpcClient;
@@ -51,7 +51,7 @@ mod tests {
             return;
         }
 
-        let result = swap_sol_to_dev_token(&rpc, &wallet, &dev_usdc).await;
+        let result = swap_sol_to_orca_dev_token(&rpc, &wallet, &dev_usdc).await;
         assert!(result.is_ok(), "Swap failed: {:?}", result.err());
 
         // Wait for RPC to catch up (Devnet can be slow)
